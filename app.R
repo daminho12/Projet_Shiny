@@ -9,7 +9,7 @@ library("jsonlite")
 library(ggplot2)
 library(dplyr)
 library(lubridate)
-
+library(lime)
 
 base="https://coronavirusapi-france.now.sh/AllDataByDepartement?"
 
@@ -21,7 +21,7 @@ for (i in 1:2){
   
   url=c(paste(base,endpoint,"=",stock[1],sep=""),paste(base,endpoint,"=",stock[2],sep=""))
   #print(url[i])
-  book_data[i]=fromJSON(url[i],flatten = TRUE)
+  book_data=c(fromJSON(url[1], flatten = TRUE), fromJSON(url[2],flatten = TRUE) )
   #print(book_data[i])
   data=rbind(book_data[1],book_data[2])
   
