@@ -19,12 +19,11 @@ stock=c("Rhône","Doubs","Bas-Rhin")
 for (i in 1:3){
   
   url=c(paste(base,endpoint,"=",stock[1],sep=""),paste(base,endpoint,"=",stock[2],sep=""),paste(base,endpoint,"=",stock[3],sep=""))
-  #print(url[i])
+ 
   book_data=c(fromJSON(url[1], flatten = TRUE), fromJSON(url[2],flatten = TRUE), fromJSON(url[3],flatten = TRUE) )
-  #print(book_data[i])
   data=rbind(book_data[1],book_data[2], book_data[3])
   
-  ##data=book_data$allDataByDepartement
+  
   data2=bind_rows(data[[1]],data[[2]],data[[3]])
   
 }
@@ -56,13 +55,8 @@ ui <- dashboardPage(
     
     #Choix de la date
     selectInput("date","Choix de la date",choices=unique(data2$date),selected = '2020-11-26'),
+  
     
-    
-    
-    ##action button 
-    #actionButton(inputId = 'action','Lancer l analyse'),
-    #actionButton(inputId = "bouton", label = "Ceci est un bouton"),
-   
     actionButton("button", "button"),
     
     
@@ -140,11 +134,7 @@ ui <- dashboardPage(
 server <- function(input, output, session){
   
   
-  
-    #observeEvent(input$do, {
-      #session$sendCustomMessage(type = 'testmessage',
-                                #message = 'Thank you for clicking')
-    #})
+
   
   output$downloadData <- downloadHandler(
     filename = function() {
@@ -163,7 +153,7 @@ server <- function(input, output, session){
       d=data2%>%filter(data2$date <=input$date_fin & data2$date >=input$date_debut & data2$nom==input$departement)
       Date=as.Date(d$date)
       df=ggplot(d, aes(x=Date, y=gueris)) + 
-        geom_point(color="magenta")+scale_x_date(date_labels = "%Y %b %d")
+        geom_line(color="magenta")+scale_x_date(date_labels = "%Y %b %d")
       out=ggplotly(df)
       out
       
@@ -174,7 +164,7 @@ server <- function(input, output, session){
       d=data2%>%filter(data2$date <=input$date_fin & data2$date >=input$date_debut & data2$nom==input$departement)
       Date=as.Date(d$date)
       df=ggplot(d, aes(x=Date, y=casConfirmes)) + 
-        geom_point(color="magenta")+scale_x_date(date_labels = "%Y %b %d")
+        geom_line(color="magenta")+scale_x_date(date_labels = "%Y %b %d")
       out=ggplotly(df)
       out
       
@@ -185,7 +175,7 @@ server <- function(input, output, session){
       d=data2%>%filter(data2$date <=input$date_fin & data2$date >=input$date_debut & data2$nom==input$departement)
       Date=as.Date(d$date)
       df=ggplot(d, aes(x=Date, y=deces)) + 
-        geom_point(color="magenta")+scale_x_date(date_labels = "%Y %b %d")
+        geom_line(color="magenta")+scale_x_date(date_labels = "%Y %b %d")
       out=ggplotly(df)
       out
       
@@ -196,7 +186,7 @@ server <- function(input, output, session){
       d=data2%>%filter(data2$date <=input$date_fin & data2$date >=input$date_debut & data2$nom==input$departement)
       Date=as.Date(d$date)
       df=ggplot(d, aes(x=Date, y=reanimation)) + 
-        geom_point(color="magenta")+scale_x_date(date_labels = "%Y %b %d")
+        geom_line(color="magenta")+scale_x_date(date_labels = "%Y %b %d")
       out=ggplotly(df)
       out
       
@@ -207,7 +197,7 @@ server <- function(input, output, session){
       d=data2%>%filter(data2$date <=input$date_fin & data2$date >=input$date_debut & data2$nom==input$departement)
       Date=as.Date(d$date)
       df=ggplot(d, aes(x=Date, y=hospitalises)) + 
-        geom_point(color="magenta")+scale_x_date(date_labels = "%Y %b %d")
+        geom_line(color="magenta")+scale_x_date(date_labels = "%Y %b %d")
       out=ggplotly(df)
       out
       
@@ -218,7 +208,7 @@ server <- function(input, output, session){
       d=data2%>%filter(data2$date <=input$date_fin & data2$date >=input$date_debut & data2$nom==input$departement)
       Date=as.Date(d$date)
       df=ggplot(d, aes(x=Date, y=nouvellesHospitalisations)) + 
-        geom_point(color="blue")+scale_x_date(date_labels = "%Y %b %d")
+        geom_line(color="blue")+scale_x_date(date_labels = "%Y %b %d")
       out=ggplotly(df)
       out
       
@@ -229,20 +219,20 @@ server <- function(input, output, session){
       d=data2%>%filter(data2$date <=input$date_fin & data2$date >=input$date_debut & data2$nom==input$departement)
       Date=as.Date(d$date)
       df=ggplot(d, aes(x=Date, y=nouvellesReanimations)) + 
-        geom_point(color="magenta")+scale_x_date(date_labels = "%Y %b %d")
+        geom_line(color="magenta")+scale_x_date(date_labels = "%Y %b %d")
       out=ggplotly(df)
       out
       
     }) 
   })
   #eventReactive(input$bouton, {
-    
+  
   #})
   
   
-    
-    
-    
+  
+  
+  
   output$valuebox1<-renderValueBox({
     hospitalises=data2%>%filter(data2$date==input$date & data2$nom==input$departement)
     
@@ -277,7 +267,7 @@ server <- function(input, output, session){
   output$valuebox6<-renderValueBox({
     hospitalises=data2%>%filter(data2$date <=input$date_fin & data2$date >=input$date_debut & data2$nom==input$departement)
     
-    valueBox(value=paste(sum(hospitalises$hospitalises)),"Hospitalisés",
+    valueBox(value=paste(sum(hospitalises$hospitalises,na.rm=TRUE)),"Hospitalisés",
              icon = icon("stethoscope"),color = "blue")
     
     
@@ -286,7 +276,7 @@ server <- function(input, output, session){
   output$valuebox7<-renderValueBox({
     hospitalises=data2%>%filter(data2$date <=input$date_fin & data2$date >=input$date_debut & data2$nom==input$departement)
     
-    valueBox(value=paste(sum(hospitalises$casConfirmes)),"Cas Confirmés",
+    valueBox(value=paste(sum(hospitalises$casConfirmes,na.rm=TRUE)),"Cas Confirmés",
              icon = icon("stethoscope"),color = "purple")
     
     
@@ -295,7 +285,7 @@ server <- function(input, output, session){
   output$valuebox8<-renderValueBox({
     hospitalises=data2%>%filter(data2$date <=input$date_fin & data2$date >=input$date_debut & data2$nom==input$departement)
     
-    valueBox(value=paste(sum(hospitalises$nouvellesReanimations)),"Nouvelles Réanimations",
+    valueBox(value=paste(sum(hospitalises$nouvellesReanimations,na.rm=TRUE)),"Nouvelles Réanimations",
              icon = icon("stethoscope"),color = "orange")
     
     
