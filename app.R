@@ -17,13 +17,14 @@ library(jsonlite)
 stock=c("Rhône","Doubs","Bas-Rhin")
 
 
-  
+  #url[i]=c(paste(base,endpoint,"=",stock[i],sep=""),paste(base,endpoint,"=",stock[i],sep=""),paste(base,endpoint,"=",stock[i],sep=""))
   url=c(paste(base,endpoint,"=",stock[1],sep=""),paste(base,endpoint,"=",stock[2],sep=""),paste(base,endpoint,"=",stock[3],sep=""))
- 
+  #print(url[i])
   book_data=c(fromJSON(url[1], flatten = TRUE), fromJSON(url[2],flatten = TRUE), fromJSON(url[3],flatten = TRUE) )
+  #print(book_data[i])
   data=rbind(book_data[1],book_data[2], book_data[3])
   
-  
+  ##data=book_data$allDataByDepartement
   data2=bind_rows(data[[1]],data[[2]],data[[3]])
   
 
@@ -55,7 +56,10 @@ ui <- dashboardPage(
     
     #Choix de la date
     selectInput("date","Choix de la date",choices=unique(data2$date),selected = '2020-11-26'),
-  
+    
+    
+    
+    
     
     actionButton("button", "button"),
     
@@ -134,7 +138,11 @@ ui <- dashboardPage(
 server <- function(input, output, session){
   
   
-
+  
+  #observeEvent(input$do, {
+  #session$sendCustomMessage(type = 'testmessage',
+  #message = 'Thank you for clicking')
+  #})
   
   output$downloadData <- downloadHandler(
     filename = function() {
@@ -236,7 +244,7 @@ server <- function(input, output, session){
   output$valuebox1<-renderValueBox({
     hospitalises=data2%>%filter(data2$date==input$date & data2$nom==input$departement)
     
-    valueBox(value=paste(hospitalises$hospitalises),"Hospitalisés",
+    valueBox(value=max(paste(hospitalises$hospitalises)),"Hospitalisés",
              icon = icon("stethoscope"),color = "blue")
     
     
@@ -245,7 +253,7 @@ server <- function(input, output, session){
   output$valuebox2<-renderValueBox({
     hospitalises=data2%>%filter(data2$date==input$date & data2$nom==input$departement)
     
-    valueBox(value=paste(hospitalises$casConfirmes),"Cas Confirmés",
+    valueBox(value=max(paste(hospitalises$casConfirmes)),"Cas Confirmés",
              icon = icon("stethoscope"),color = "purple")
     
     
@@ -254,7 +262,7 @@ server <- function(input, output, session){
   output$valuebox3<-renderValueBox({
     hospitalises=data2%>%filter(data2$date==input$date & data2$nom==input$departement)
     
-    valueBox(value=paste(hospitalises$nouvellesReanimations),"Nouvelles Réanimations",
+    valueBox(value=max(paste(hospitalises$nouvellesReanimations)),"Nouvelles Réanimations",
              icon = icon("stethoscope"),color = "orange")
     
     
