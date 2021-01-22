@@ -16,7 +16,7 @@ endpoint="Departement"
 library(jsonlite)
 stock=c("Rhône","Doubs","Bas-Rhin")
 
-for (i in 1:3){
+
   
   url=c(paste(base,endpoint,"=",stock[1],sep=""),paste(base,endpoint,"=",stock[2],sep=""),paste(base,endpoint,"=",stock[3],sep=""))
  
@@ -26,7 +26,7 @@ for (i in 1:3){
   
   data2=bind_rows(data[[1]],data[[2]],data[[3]])
   
-}
+
 data2=as.data.frame(data2)
 
 
